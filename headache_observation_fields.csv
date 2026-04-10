@@ -1,0 +1,40 @@
+欄位路徑,必填,資料型態,說明,範例值,代碼系統/規範參考,備註
+resourceType,是,string,資源類型，固定值,Observation,FHIR R4 Base,不可變更
+id,否,id,資源唯一識別碼（UUID 或業務編號）,headache-obs-001,FHIR R4 Base,建議使用 UUID
+meta.profile[],否,uri[],所遵循之 StructureDefinition Profile URL,[http://hl7.org/fhir/StructureDefinition/Observation],FHIR R4 Base,可擴展至 TW Core IG
+meta.lastUpdated,否,instant,資源最後更新時間（ISO 8601 含時區）,2026-04-10T08:35:00+08:00,FHIR R4 Base,格式：YYYY-MM-DDTHH:mm:ssZ
+text.status,否,code,敘述文字狀態,generated,FHIR R4 Narrative,可選值：generated / extensions / additional / empty
+text.div,否,xhtml,人類可讀 XHTML 摘要敘述,<div>...</div>,FHIR R4 Narrative,須含 xmlns 宣告
+status,是,code,觀察記錄狀態,final,Observation.status,可選值：registered / preliminary / final / amended / corrected / cancelled / unknown
+category[].coding[].system,否,uri,分類代碼系統 URI,http://terminology.hl7.org/CodeSystem/observation-category,Observation.category,固定使用此系統
+category[].coding[].code,否,code,分類代碼,survey,Observation.category,主訴/問卷建議使用 survey；生命徵象用 vital-signs
+category[].coding[].display,否,string,分類代碼顯示名稱,Survey,Observation.category,
+category[].text,否,string,分類中文說明,問卷/主訴,Observation.category,
+code.coding[].system,是,uri,觀察項目代碼系統,http://snomed.info/sct,Observation.code,SNOMED CT 或 LOINC
+code.coding[].code,是,code,頭痛主題代碼（SNOMED 25064002）,25064002,Observation.code + SNOMED CT,25064002 = Headache (finding)
+code.coding[].display,否,string,代碼英文顯示名稱,Headache (finding),Observation.code,
+code.text,否,string,代碼中文說明,頭痛,Observation.code,
+subject.reference,是,Reference(Patient),病患資源參照，格式 Patient/{id},Patient/patient-001,Observation.subject,
+subject.display,否,string,病患顯示姓名,王小明,Observation.subject,UI 顯示用
+effectiveDateTime,是,dateTime,症狀發生或記錄時間（含時區）,2026-04-10T08:30:00+08:00,Observation.effective[x],FHIR 使用 effective[x] 多型欄位
+issued,否,instant,觀察記錄正式發布時間,2026-04-10T08:35:00+08:00,Observation.issued,
+performer[].reference,否,Reference,記錄者參照（可為病患本人，表示自述）,Patient/patient-001,Observation.performer,
+performer[].display,否,string,記錄者顯示名稱,王小明（民眾自述）,Observation.performer,
+note[].text,否,markdown,附加文字說明或備註,民眾自述頭痛持續約2小時,Observation.note,
+component[n].code.coding[].system,是,uri,Component 觀察項目代碼系統,http://loinc.org 或 http://snomed.info/sct,Observation.component.code,
+component[n].code.coding[].code,是,code,Component 觀察項目代碼,72514-3,Observation.component.code,各 component 代碼詳見下方說明
+component[n].code.coding[].display,否,string,Component 英文顯示名稱,Pain severity - 0-10 verbal numeric rating [Score],Observation.component.code,
+component[n].code.text,否,string,Component 中文說明,疼痛程度（0–10 分）,Observation.component.code,
+-------------- Component 說明 --------------,,,,,,,
+【Component 1】疼痛程度（Severity）,,,,,,,
+component[0].code.coding[].code,是,code,疼痛數值量表代碼,72514-3,LOINC,72514-3 = Pain severity 0-10 VNR
+component[0].valueQuantity.value,是,decimal,疼痛數值 0 至 10,7,Observation.component.value[x],0=無痛；10=最大痛
+component[0].valueQuantity.unit,否,string,單位名稱,score,UCUM,
+component[0].valueQuantity.system,否,uri,UCUM 單位系統,http://unitsofmeasure.org,UCUM,
+component[0].valueQuantity.code,否,code,UCUM 單位代碼,{score},UCUM,
+【Component 2】疼痛部位（Location）,,,,,,,
+component[1].code.coding[].code,是,code,疼痛部位觀察項目代碼,722546004,SNOMED CT,722546004 = Location of pain
+component[1].valueCodeableConcept.coding[].code,是,code,解剖部位 SNOMED 代碼,6757004,SNOMED CT,見 headache_location_valueset.csv
+【Component 3】疼痛性質（Character）,,,,,,,
+component[2].code.coding[].code,是,code,疼痛性質觀察項目代碼,255314001,SNOMED CT,255314001 = Pain character
+component[2].valueCodeableConcept.coding[].code,是,code,疼痛性質 SNOMED 代碼,44695005,SNOMED CT,見 headache_character_valueset.csv

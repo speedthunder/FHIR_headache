@@ -1,0 +1,118 @@
+{
+  "resourceType": "Observation",
+  "id": "headache-obs-001",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/StructureDefinition/Observation"
+    ],
+    "lastUpdated": "2026-04-10T08:35:00+08:00"
+  },
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>民眾主訴頭痛觀察記錄 - 王小明，疼痛指數 7/10，右顳部，搏動性疼痛</p></div>"
+  },
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+          "code": "survey",
+          "display": "Survey"
+        }
+      ],
+      "text": "問卷/主訴"
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "25064002",
+        "display": "Headache (finding)"
+      }
+    ],
+    "text": "頭痛"
+  },
+  "subject": {
+    "reference": "Patient/patient-001",
+    "display": "王小明"
+  },
+  "effectiveDateTime": "2026-04-10T08:30:00+08:00",
+  "issued": "2026-04-10T08:35:00+08:00",
+  "performer": [
+    {
+      "reference": "Patient/patient-001",
+      "display": "王小明（民眾自述）"
+    }
+  ],
+  "note": [
+    {
+      "text": "民眾自述頭痛，位於右側太陽穴（右顳部），搏動性跳痛，疼痛指數 7 分（0–10 分，0 為無痛，10 為無法忍受）"
+    }
+  ],
+  "component": [
+    {
+      "code": {
+        "coding": [
+          {
+            "system": "http://loinc.org",
+            "code": "72514-3",
+            "display": "Pain severity - 0-10 verbal numeric rating [Score]"
+          }
+        ],
+        "text": "疼痛程度（0–10 分）"
+      },
+      "valueQuantity": {
+        "value": 7,
+        "unit": "score",
+        "system": "http://unitsofmeasure.org",
+        "code": "{score}"
+      }
+    },
+    {
+      "code": {
+        "coding": [
+          {
+            "system": "http://snomed.info/sct",
+            "code": "722546004",
+            "display": "Location of pain (observable entity)"
+          }
+        ],
+        "text": "疼痛部位"
+      },
+      "valueCodeableConcept": {
+        "coding": [
+          {
+            "system": "http://snomed.info/sct",
+            "code": "6757004",
+            "display": "Structure of right temporal region"
+          }
+        ],
+        "text": "右顳部（右太陽穴）"
+      }
+    },
+    {
+      "code": {
+        "coding": [
+          {
+            "system": "http://snomed.info/sct",
+            "code": "255314001",
+            "display": "Pain character (observable entity)"
+          }
+        ],
+        "text": "疼痛性質"
+      },
+      "valueCodeableConcept": {
+        "coding": [
+          {
+            "system": "http://snomed.info/sct",
+            "code": "44695005",
+            "display": "Pulsating sensation"
+          }
+        ],
+        "text": "搏動性疼痛（波動跳痛）"
+      }
+    }
+  ]
+}

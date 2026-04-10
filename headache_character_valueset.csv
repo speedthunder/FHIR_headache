@@ -1,0 +1,16 @@
+Value Set 名稱（Name）: HeadachePainCharacter
+說明（Description）: 頭痛疼痛性質（Character / Quality）編碼定義；Component 觀察項目代碼 SNOMED 255314001 - Pain character
+代碼系統（Code System）: SNOMED CT  |  http://snomed.info/sct
+SNOMED 版本（Version）: 2024-03-31（請依實際 Release 驗證）
+用途（Usage）: Observation.component[Character].valueCodeableConcept
+參考標準: IHS（International Headache Society）頭痛分類（ICHD-3）疼痛性質描述
+
+代碼(Code),代碼系統(System),英文名稱(Display Name),中文名稱,中文描述,特徵說明,臨床意義（對應頭痛類型）
+44695005,http://snomed.info/sct,Pulsating sensation,搏動性（波動跳痛）,隨心跳節律波動的疼痛，如心跳般一跳一跳,IHS 偏頭痛診斷標準四大疼痛特徵之一,偏頭痛（Migraine）— ICHD-3 診斷指標
+55145008,http://snomed.info/sct,Throbbing pain,陣發性跳痛,有強烈節律的陣發跳動感，比搏動性更劇烈,搏動感強化、振幅更明顯,偏頭痛（Migraine）/ 血管性頭痛
+34713003,http://snomed.info/sct,Pricking sensation,刺痛性（針刺感）,如細針或尖物刺穿般的急性疼痛,短暫、局限性尖銳刺痛,叢集性頭痛 / 原發性刺痛性頭痛（Stabbing）
+7895008,http://snomed.info/sct,Sharp pain,銳痛（尖銳痛）,強烈、明確的尖銳疼痛，邊界清晰,突發性強烈疼痛,叢集性頭痛 / 三叉神經痛 / 神經痛
+410430009,http://snomed.info/sct,Aching,鈍痛酸痛性,持續性深層悶痛或酸脹感，邊界模糊,持續、彌漫、不明顯邊界之悶重感,緊張型頭痛（TTH）/ 肌肉緊張性頭痛
+26614003,http://snomed.info/sct,Pressing pain sensation,壓迫性（壓迫感）,如重物壓在頭部的持續壓力感，無搏動性,IHS 緊張型頭痛特徵（非搏動），如帶或盔壓頭,緊張型頭痛（TTH）— ICHD-3 診斷指標
+23924001,http://snomed.info/sct,Tight sensation,緊縮性（箍緊感）,如頭部被箍緊或帽子過緊的束緊感,全頭或後枕部緊繃束縛感，常伴頸肌緊張,緊張型頭痛（TTH）/ 頸源性頭痛
+36349006,http://snomed.info/sct,Burning sensation,灼熱性（灼燒感）,如灼燒或熱感的疼痛，皮膚表面或深層均可,局部或瀰漫性熱灼感，夜間可能加重,神經病變性頭痛 / 帶狀疱疹後神經痛

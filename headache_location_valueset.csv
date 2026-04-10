@@ -1,0 +1,15 @@
+Value Set 名稱（Name）: HeadachePainLocation
+說明（Description）: 頭痛疼痛部位（Location）編碼定義；Component 觀察項目代碼 SNOMED 722546004 - Location of pain
+代碼系統（Code System）: SNOMED CT  |  http://snomed.info/sct
+SNOMED 版本（Version）: 2024-03-31（請依實際 Release 驗證）
+用途（Usage）: Observation.component[Location].valueCodeableConcept
+
+代碼(Code),代碼系統(System),英文名稱(Display Name),中文名稱,解剖說明,臨床應用情境,建議頭痛類型
+69536005,http://snomed.info/sct,Head structure,全頭,整個頭部廣泛性疼痛，無特定局部,頭痛蔓延整個頭部時選用,緊張型頭痛 / 發燒性頭痛 / 流感頭痛
+9454009,http://snomed.info/sct,Structure of frontal region of head,前額部,前額至眉心區域（額葉前方）,額部悶痛或壓迫感,緊張型頭痛 / 鼻竇性頭痛 / 額竇炎
+81327009,http://snomed.info/sct,Structure of temporal region,顳部（雙側太陽穴）,頭部兩側顳骨覆蓋區域（雙側）,雙側太陽穴同時疼痛,緊張型頭痛 / 顳動脈炎
+6757004,http://snomed.info/sct,Structure of right temporal region,右顳部（右太陽穴）,頭部右側顳骨覆蓋區域,右側搏動性或壓迫性疼痛,偏頭痛（右側發作）
+8170008,http://snomed.info/sct,Structure of left temporal region,左顳部（左太陽穴）,頭部左側顳骨覆蓋區域,左側搏動性或壓迫性疼痛,偏頭痛（左側發作）
+31065004,http://snomed.info/sct,Structure of occipital region,枕部（後腦勺）,頭後部枕骨覆蓋區域（頸枕交界）,後腦悶痛或牽扯性疼痛,緊張型頭痛 / 頸源性頭痛 / 枕神經痛
+14414005,http://snomed.info/sct,Structure of parietal region,頂部（頭頂）,頭頂頂骨覆蓋區域（顱頂）,頭頂壓迫或悶重感,緊張型頭痛 / 高顱壓頭痛
+56564000,http://snomed.info/sct,Structure of eye region,眼眶周圍區域,眼眶及球後區域,眼睛後方或眼周劇痛,叢集性頭痛 / 眼部相關頭痛

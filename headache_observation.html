@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>頭痛 FHIR Observation 產生器</title>
+  <style>
+    :root {
+      --primary:       #2563eb;
+      --primary-light: #3b82f6;
+      --primary-bg:    #eff6ff;
+      --success:       #16a34a;
+      --danger:        #dc2626;
+      --bg:            #f1f5f9;
+      --card:          #ffffff;
+      --border:        #e2e8f0;
+      --text:          #1e293b;
+      --muted:         #64748b;
+      --radius:        12px;
+      --shadow:        0 2px 8px rgba(0,0,0,.07);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", "PingFang TC", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 28px 16px 48px;
+    }
+
+    .page-header { text-align: center; margin-bottom: 32px; }
+    .page-header h1 { font-size: 1.8rem; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
+    .page-header p { color: var(--muted); font-size: .9rem; }
+    .badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: .72rem; font-weight: 600; background: #dbeafe; color: #1d4ed8; margin: 0 3px; }
+
+    .layout { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 24px; max-width: 1280px; margin: 0 auto; }
+    @media (max-width: 820px) { .layout { grid-template-columns: 1fr; } }
+
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); }
+    .card-title { font-size: 1rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; color: var(--text); }
+    .card-title::before { content: ''; width: 4px; height: 18px; background: var(--primary); border-radius: 2px; flex-shrink: 0; }
+
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; font-size: .82rem; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+    .req { color: var(--danger); margin-left: 2px; }
+
+    input[type="text"], input[type="datetime-local"], textarea {
+      width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px;
+      font-size: .88rem; color: var(--text); background: #fff; outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    input:focus, textarea:focus { border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(59,130,246,.14); }
+    textarea { resize: vertical; min-height: 70px; }
+
+    .slider-wrap { display: flex; align-items: center; gap: 12px; }
+    input[type="range"] { flex: 1; -webkit-appearance: none; height: 7px; border-radius: 4px; background: linear-gradient(to right, #22c55e 0%, #eab308 50%, #ef4444 100%); outline: none; cursor: pointer; border: none; padding: 0; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--primary); border: 3px solid #fff; box-shadow: 0 1px 6px rgba(0,0,0,.2); cursor: pointer; }
+    .sev-val { min-width: 46px; font-size: 1.6rem; font-weight: 700; text-align: center; color: var(--primary); }
+    .sev-labels { display: flex; justify-content: space-between; font-size: .72rem; color: var(--muted); margin-top: 4px; padding: 0 2px; }
+
+    .cb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .cb-item { display: flex; align-items: flex-start; gap: 8px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: border-color .15s, background .15s; user-select: none; }
+    .cb-item:hover { border-color: var(--primary-light); background: var(--primary-bg); }
+    .cb-item input[type="checkbox"] { margin-top: 2px; width: 15px; height: 15px; cursor: pointer; accent-color: var(--primary); }
+    .cb-item .cb-label { font-size: .84rem; font-weight: 600; line-height: 1.3; }
+    .cb-item .cb-sub   { font-size: .7rem; color: var(--muted); margin-top: 1px; }
+
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 20px; border-radius: 8px; font-size: .9rem; font-weight: 600; cursor: pointer; border: none; transition: all .18s; }
+    .btn-primary  { background: var(--primary); color: #fff; width: 100%; padding: 13px; font-size: 1rem; }
+    .btn-primary:hover { background: #1d4ed8; box-shadow: 0 4px 14px rgba(37,99,235,.35); transform: translateY(-1px); }
+    .btn-outline  { background: #fff; color: var(--muted); border: 1px solid var(--border); padding: 7px 14px; font-size: .82rem; }
+    .btn-outline:hover { background: #f8fafc; }
+    .btn-warning  { background: #f59e0b; color: #fff; }
+    .btn-warning:hover { background: #d97706; }
+    .btn-success  { background: var(--success); color: #fff; }
+    .btn-success:hover { background: #15803d; }
+    .btn-danger   { background: var(--danger); color: #fff; }
+    .btn-danger:hover  { background: #b91c1c; }
+
+    .out-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .out-actions { display: flex; gap: 8px; }
+
+    #json-box { background: #0f172a; color: #cbd5e1; border-radius: 8px; padding: 16px; font-family: "Consolas","Monaco","Cascadia Code","Courier New",monospace; font-size: .78rem; line-height: 1.65; min-height: 440px; max-height: 680px; overflow: auto; white-space: pre; }
+    .placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 340px; color: #475569; font-style: italic; font-size: .88rem; gap: 10px; }
+    .placeholder svg { opacity: .3; }
+
+    .jk { color: #7dd3fc; }
+    .js { color: #86efac; }
+    .jn { color: #fdba74; }
+    .jb { color: #f9a8d4; }
+    .jz { color: #c4b5fd; }
+
+    .status-bar { display: flex; align-items: center; gap: 7px; margin-top: 10px; font-size: .78rem; color: var(--muted); }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #94a3b8; }
+    .dot.ok { background: #22c55e; }
+
+    #toast { position: fixed; bottom: 28px; right: 24px; background: #1e293b; color: #f1f5f9; padding: 12px 20px; border-radius: 10px; font-size: .85rem; opacity: 0; transform: translateY(10px); transition: opacity .3s, transform .3s; z-index: 9999; pointer-events: none; }
+    #toast.show { opacity: 1; transform: translateY(0); }
+
+    .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+    #json-editor { display: none; background: #0f172a; color: #e2e8f0; border: 2px solid var(--primary); border-radius: 8px; padding: 16px; font-family: "Consolas","Monaco",monospace; font-size: .78rem; line-height: 1.65; min-height: 440px; max-height: 680px; resize: vertical; outline: none; width: 100%; }
+    #json-editor.err { border-color: var(--danger); }
+    .edit-err { display: none; color: var(--danger); font-size: .76rem; margin-top: 6px; padding: 6px 10px; background: #fef2f2; border-radius: 6px; border: 1px solid #fecaca; }
+  </style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>🩺 頭痛 FHIR Observation 產生器</h1>
+  <p>
+    <span class="badge">FHIR R4</span>
+    <span class="badge">SNOMED CT</span>
+    <span class="badge">LOINC</span>
+    &nbsp;填寫民眾頭痛症狀後，點擊按鈕即可產生標準 FHIR Observation JSON
+  </p>
+</div>
+
+<div class="layout">
+  <div class="card">
+    <div class="card-title">症狀輸入表單</div>
+    <div class="form-group"><label>病患 ID <span class="req">*</span></label><input type="text" id="patientId" placeholder="例：patient-001" value="patient-001" /></div>
+    <div class="form-group"><label>病患姓名（顯示用）</label><input type="text" id="patientName" placeholder="例：王小明" /></div>
+    <div class="form-group"><label>症狀時間 <span class="req">*</span></label><input type="datetime-local" id="effectiveDT" /></div>
+    <hr class="divider" />
+    <div class="form-group">
+      <label>疼痛程度（0–10 分）<span class="req">*</span></label>
+      <div class="slider-wrap">
+        <input type="range" id="severity" min="0" max="10" step="1" value="5" oninput="document.getElementById('sevVal').textContent=this.value" />
+        <div class="sev-val" id="sevVal">5</div>
+      </div>
+      <div class="sev-labels"><span>0 無痛</span><span>5 中度</span><span>10 無法忍受</span></div>
+    </div>
+    <hr class="divider" />
+    <div class="form-group"><label>疼痛部位 <span class="req">*</span>（可多選）</label><div class="cb-grid" id="locationGrid"></div></div>
+    <hr class="divider" />
+    <div class="form-group"><label>疼痛性質 <span class="req">*</span>（可多選）</label><div class="cb-grid" id="characterGrid"></div></div>
+    <hr class="divider" />
+    <div class="form-group"><label>備註說明</label><textarea id="notes" placeholder="民眾自述其他說明（選填）..."></textarea></div>
+    <button class="btn btn-primary" onclick="generate()">⚡ 產生 FHIR Observation JSON</button>
+  </div>
+
+  <div class="card" style="display:flex;flex-direction:column;">
+    <div class="out-header">
+      <div class="card-title" style="margin-bottom:0">FHIR JSON 輸出</div>
+      <div class="out-actions" id="viewActions">
+        <button class="btn btn-warning" onclick="enterEdit()">✏️ 編輯</button>
+        <button class="btn btn-outline" onclick="copyJSON()">📋 複製</button>
+        <button class="btn btn-outline" onclick="downloadJSON()">💾 下載</button>
+      </div>
+      <div class="out-actions" id="editActions" style="display:none">
+        <button class="btn btn-success" onclick="applyEdit()">✅ 套用</button>
+        <button class="btn btn-danger"  onclick="cancelEdit()">✖ 取消</button>
+      </div>
+    </div>
+    <div id="json-box">
+      <div class="placeholder">
+        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.4">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+          <polyline points="10 9 9 9 8 9"/>
+        </svg>
+        請填寫左側表單後點擊「產生」按鈕
+      </div>
+    </div>
+    <textarea id="json-editor" spellcheck="false" autocomplete="off"></textarea>
+    <div class="edit-err" id="editErr"></div>
+    <div class="status-bar">
+      <div class="dot" id="statusDot"></div>
+      <span id="statusText">尚未產生</span>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const locationVS = [
+  { code:'69536005', display:'Head structure',                         zh:'全頭',         sub:'整個頭部' },
+  { code:'9454009',  display:'Structure of frontal region of head',    zh:'前額部',       sub:'前額/眉心' },
+  { code:'81327009', display:'Structure of temporal region',           zh:'顳部（雙側）', sub:'雙側太陽穴' },
+  { code:'6757004',  display:'Structure of right temporal region',     zh:'右顳部',       sub:'右太陽穴' },
+  { code:'8170008',  display:'Structure of left temporal region',      zh:'左顳部',       sub:'左太陽穴' },
+  { code:'31065004', display:'Structure of occipital region',          zh:'枕部',         sub:'後腦勺' },
+  { code:'14414005', display:'Structure of parietal region',           zh:'頂部',         sub:'頭頂' },
+  { code:'56564000', display:'Structure of eye region',                zh:'眼眶周圍',     sub:'眼眶/球後' },
+];
+
+const characterVS = [
+  { code:'44695005',  display:'Pulsating sensation',     zh:'搏動性',       sub:'波動跳痛' },
+  { code:'55145008',  display:'Throbbing pain',          zh:'陣發性跳痛',   sub:'節律跳動感' },
+  { code:'34713003',  display:'Pricking sensation',      zh:'刺痛性',       sub:'針刺感' },
+  { code:'7895008',   display:'Sharp pain',              zh:'銳痛',         sub:'尖銳感' },
+  { code:'410430009', display:'Aching',                  zh:'鈍痛酸痛',     sub:'悶脹感' },
+  { code:'26614003',  display:'Pressing pain sensation', zh:'壓迫性',       sub:'重壓感' },
+  { code:'23924001',  display:'Tight sensation',         zh:'緊縮性',       sub:'箍緊感' },
+  { code:'36349006',  display:'Burning sensation',       zh:'灼熱性',       sub:'灼燒感' },
+];
+
+(function init() {
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  document.getElementById('effectiveDT').value = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  renderCbGrid('locationGrid',  locationVS,  'loc');
+  renderCbGrid('characterGrid', characterVS, 'chr');
+})();
+
+function renderCbGrid(cid, vs, prefix) {
+  document.getElementById(cid).innerHTML = vs.map(v => `
+    <label class="cb-item">
+      <input type="checkbox" id="${prefix}-${v.code}" value="${v.code}" />
+      <div><div class="cb-label">${v.zh}</div><div class="cb-sub">${v.sub} · ${v.code}</div></div>
+    </label>`).join('');
+}
+
+function generate() {
+  const patientId   = document.getElementById('patientId').value.trim();
+  const patientName = document.getElementById('patientName').value.trim();
+  const dtRaw       = document.getElementById('effectiveDT').value;
+  const severity    = Number(document.getElementById('severity').value);
+  const notes       = document.getElementById('notes').value.trim();
+
+  if (!patientId) { toast('❗ 請輸入病患 ID'); return; }
+  if (!dtRaw)     { toast('❗ 請選擇症狀發生時間'); return; }
+
+  const selLoc = locationVS.filter(v => document.getElementById(`loc-${v.code}`)?.checked);
+  const selChr = characterVS.filter(v => document.getElementById(`chr-${v.code}`)?.checked);
+  if (!selLoc.length) { toast('❗ 請選擇至少一個疼痛部位'); return; }
+  if (!selChr.length) { toast('❗ 請選擇至少一個疼痛性質'); return; }
+
+  const tzOffset = -(new Date().getTimezoneOffset());
+  const tzSign   = tzOffset >= 0 ? '+' : '-';
+  const tzH      = String(Math.floor(Math.abs(tzOffset)/60)).padStart(2,'0');
+  const tzM      = String(Math.abs(tzOffset)%60).padStart(2,'0');
+  const tzSuffix = `${tzSign}${tzH}:${tzM}`;
+  const effectiveDT = `${dtRaw}:00${tzSuffix}`;
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  const issuedDT = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}${tzSuffix}`;
+
+  const components = [];
+  components.push({ code:{ coding:[{ system:'http://loinc.org', code:'72514-3', display:'Pain severity - 0-10 verbal numeric rating [Score]' }], text:'疼痛程度（0–10 分）' }, valueQuantity:{ value:severity, unit:'score', system:'http://unitsofmeasure.org', code:'{score}' } });
+  selLoc.forEach(loc => components.push({ code:{ coding:[{ system:'http://snomed.info/sct', code:'722546004', display:'Location of pain (observable entity)' }], text:'疼痛部位' }, valueCodeableConcept:{ coding:[{ system:'http://snomed.info/sct', code:loc.code, display:loc.display }], text:loc.zh } }));
+  selChr.forEach(ch  => components.push({ code:{ coding:[{ system:'http://snomed.info/sct', code:'255314001', display:'Pain character (observable entity)' }], text:'疼痛性質' }, valueCodeableConcept:{ coding:[{ system:'http://snomed.info/sct', code:ch.code, display:ch.display }], text:ch.zh } }));
+
+  const obsId = `headache-obs-${Date.now()}`;
+  const obs = {
+    resourceType:'Observation', id:obsId,
+    meta:{ profile:['http://hl7.org/fhir/StructureDefinition/Observation'], lastUpdated:issuedDT },
+    text:{ status:'generated', div:`<div xmlns="http://www.w3.org/1999/xhtml"><p>頭痛觀察記錄 — 疼痛指數 ${severity}/10</p></div>` },
+    status:'final',
+    category:[{ coding:[{ system:'http://terminology.hl7.org/CodeSystem/observation-category', code:'survey', display:'Survey' }], text:'問卷/主訴' }],
+    code:{ coding:[{ system:'http://snomed.info/sct', code:'25064002', display:'Headache (finding)' }], text:'頭痛' },
+    subject:{ reference:`Patient/${patientId}`, ...(patientName && { display:patientName }) },
+    effectiveDateTime:effectiveDT, issued:issuedDT,
+    performer:[{ reference:`Patient/${patientId}`, ...(patientName && { display:`${patientName}（民眾自述）` }) }],
+    ...(notes && { note:[{ text:notes }] }),
+    component:components
+  };
+
+  cancelEditSilent();
+  const jsonStr = JSON.stringify(obs, null, 2);
+  document.getElementById('json-box').innerHTML = syntaxHL(jsonStr);
+  window._jsonStr = jsonStr; window._obsId = obsId;
+  document.getElementById('statusDot').classList.add('ok');
+  document.getElementById('statusText').textContent = `已產生 — ${components.length} 個 component（部位 ${selLoc.length}，性質 ${selChr.length}）`;
+  toast('✅ FHIR JSON 產生成功！');
+}
+
+function syntaxHL(raw) {
+  const esc = raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return esc.replace(
+    /("(?:\\u[0-9a-fA-F]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(?:true|false)\b|\bnull\b|-?\d+(?:\.\d+)?(?:[eE][+\-]?\d+)?)/g,
+    m => {
+      if (/^"/. test(m)) return /:$/.test(m) ? `<span class="jk">${m}</span>` : `<span class="js">${m}</span>`;
+      if (/true|false/.test(m)) return `<span class="jb">${m}</span>`;
+      if (/null/.test(m))       return `<span class="jz">${m}</span>`;
+      return `<span class="jn">${m}</span>`;
+    }
+  );
+}
+
+function copyJSON() {
+  if (!window._jsonStr) { toast('請先產生 FHIR JSON'); return; }
+  navigator.clipboard.writeText(window._jsonStr)
+    .then(() => toast('✅ 已複製到剪貼簿！'))
+    .catch(() => { const ta = document.createElement('textarea'); ta.value = window._jsonStr; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); toast('✅ 已複製到剪貼簿！'); });
+}
+
+function downloadJSON() {
+  if (!window._jsonStr) { toast('請先產生 FHIR JSON'); return; }
+  const blob = new Blob([window._jsonStr], { type:'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a = Object.assign(document.createElement('a'), { href:url, download:`${window._obsId}.json` });
+  a.click(); URL.revokeObjectURL(url);
+  toast('✅ 已下載 JSON 檔！');
+}
+
+function enterEdit() {
+  if (!window._jsonStr) { toast('❗ 請先產生 FHIR JSON'); return; }
+  const editor = document.getElementById('json-editor');
+  editor.value = window._jsonStr;
+  document.getElementById('json-box').style.display = 'none';
+  editor.style.display = 'block';
+  editor.classList.remove('err');
+  document.getElementById('editErr').style.display = 'none';
+  document.getElementById('viewActions').style.display = 'none';
+  document.getElementById('editActions').style.display = 'flex';
+  document.getElementById('statusText').textContent = '✏️ 編輯中...';
+  editor.focus();
+}
+
+function applyEdit() {
+  const editor = document.getElementById('json-editor');
+  const errEl  = document.getElementById('editErr');
+  let parsed;
+  try { parsed = JSON.parse(editor.value.trim()); }
+  catch(e) { editor.classList.add('err'); errEl.textContent = '❌ JSON 格式錯誤：' + e.message; errEl.style.display = 'block'; return; }
+  const jsonStr = JSON.stringify(parsed, null, 2);
+  window._jsonStr = jsonStr; window._obsId = parsed.id || window._obsId;
+  document.getElementById('json-box').innerHTML = syntaxHL(jsonStr);
+  document.getElementById('json-box').style.display = 'block';
+  editor.style.display = 'none'; editor.classList.remove('err'); errEl.style.display = 'none';
+  document.getElementById('viewActions').style.display = 'flex';
+  document.getElementById('editActions').style.display = 'none';
+  document.getElementById('statusDot').classList.add('ok');
+  document.getElementById('statusText').textContent = '✅ 已套用編輯變更';
+  toast('✅ JSON 已更新！');
+}
+
+function cancelEdit() { cancelEditSilent(); document.getElementById('statusText').textContent = '已取消編輯'; toast('已取消，保留原始 JSON'); }
+
+function cancelEditSilent() {
+  const editor = document.getElementById('json-editor');
+  editor.style.display = 'none'; editor.classList.remove('err');
+  document.getElementById('editErr').style.display = 'none';
+  document.getElementById('json-box').style.display = 'block';
+  document.getElementById('viewActions').style.display = 'flex';
+  document.getElementById('editActions').style.display = 'none';
+}
+
+let _toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
